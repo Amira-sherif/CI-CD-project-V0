@@ -4,7 +4,7 @@
   gather_facts: false
   remote_user: root
   tasks:
-    - name: Build Docker image
+    - name: stop Build Docker image
       docker_image:
         name: node:12
         state: absent
