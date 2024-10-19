@@ -1,6 +1,13 @@
 ---
-- name: Build and run Docker image for web app
-  hosts: localhost
+- name: Deploy Docker container on Ubuntu
+  hosts: ubuntu
+  become: yes
+  vars:
+    container_name: my-app-container       # Change this to your desired container name
+    image_name: islamreda/nodejs-iamge:v1.4
+         # Change this to your Docker image name
+    container_port: 3000                    # Change this to your application's port
+
   tasks:
     - name: Ensure Docker is installed
       apt:
@@ -8,18 +15,31 @@
         state: present
       become: yes
 
-    - name: Build the Docker image
-      docker_image:
-        path: dockerfile
-        name: my-web-app
-        tag: latest
-        state: present
+    - name: Start Docker service
+      service:
+        name: docker
+        state: started
+        enabled: yes
 
-    - name: Run the Docker container
-      docker_container:
-        name: my-web-container
-        image: my-web-app:latest
+    - name: Run Docker container
+      community.docker.docker_container:
+        name: "{{ container_name }}"
+        image: "{{ image_name }}"
         state: started
         restart_policy: unless-stopped
         published_ports:
-          - "3000:3000"
+          - "{{ container_port }}:3000"  # Ensure this matches your application
+
+    - name: Wait for the application to be up and running
+      uri:
+        url: "http://{{ ansible_host }}:{{ container_port }}"
+        status_code: 200
+        timeout: 60
+      register: app_status
+      retries: 6
+      delay: 10
+      until: app_status is succeeded
+
+    - name: Print application URL
+      debug:
+        msg: "Application is running at http://{{ ansible_host }}:{{ container_port }}"
