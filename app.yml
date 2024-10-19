@@ -1,0 +1,26 @@
+---
+- name: Build and run Docker image for web app
+  hosts: localhost
+  tasks:
+    - name: Ensure Docker is installed
+      apt:
+        name: docker.io
+        state: present
+      become: yes
+
+    - name: Build the Docker image
+      docker_image:
+        path: .
+        name: my-web-app
+        tag: latest
+        state: present
+
+    - name: Run the Docker container
+      docker_container:
+        name: my-web-container
+        image: my-web-app:latest
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "3000:3000"
+
