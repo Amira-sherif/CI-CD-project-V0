@@ -10,7 +10,7 @@
 
     - name: Build the Docker image
       docker_image:
-        path: .
+        path: dockerfile
         name: my-web-app
         tag: latest
         state: present
