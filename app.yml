@@ -1,6 +1,6 @@
 ---
 - name: Build and run Docker image for web app
-  hosts: slave-ec2
+  hosts: localhost
   tasks:
     - name: Ensure Docker is installed
       apt:
@@ -8,13 +8,18 @@
         state: present
       become: yes
 
+    - name: Build the Docker image
+      docker_image:
+        path: .
+        name: my-web-app
+        tag: latest
+        state: present
 
-
-    - name: Build Docker image using command
-      command: docker build -t your-image-name:latest /home/sara/depi2
-      become: yes
-
- 
-    - name: Run Docker container using command
-      command: docker run -d --name my-web-container -p 3000:3000 your-image-name:latest
-
+    - name: Run the Docker container
+      docker_container:
+        name: my-web-container
+        image: my-web-app:latest
+        state: started
+        restart_policy: unless-stopped
+        published_ports:
+          - "3000:3000"
