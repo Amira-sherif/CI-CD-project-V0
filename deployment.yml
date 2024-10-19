@@ -1,6 +1,6 @@
 ---
 - name: Build Docker
-  hosts: dockerservers
+  hosts: 13.61.21.200
   gather_facts: false
   remote_user: root
   tasks:
