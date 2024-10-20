@@ -1,6 +1,6 @@
 ---
 - name: Deploy Docker container on Ubuntu
-  hosts: ubuntu
+  hosts: slave-ec2
   become: yes
   vars:
     container_name: my-app-container       # Change this to your desired container name
