@@ -3,10 +3,9 @@
   hosts: slave-ec2
   become: yes
   vars:
-    container_name: my-app-container       # Change this to your desired container name
-    image_name: islamreda/nodejs-iamge:v1.4
-         # Change this to your Docker image name
-    container_port: 3000                    # Change this to your application's port
+    container_name: my-app-container         # Change this to your desired container name
+    image_name: islamreda/nodejs-iamge:v1.4  # Change this to your Docker image name
+    container_port: 3000                     # Change this to your application's port
 
   tasks:
     - name: Ensure Docker is installed
