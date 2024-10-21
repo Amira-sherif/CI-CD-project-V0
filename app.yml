@@ -1,44 +1,43 @@
----
-- name: Deploy Docker container on Ubuntu
-  hosts: slave-ec2
+- name: Pull Docker Image and Run Container
+  hosts: ec2_instances
   become: yes
   vars:
-    container_name: my-app-container         # Change this to your desired container name
-    image_name: islamreda/nodejs-iamge:v1.4  # Change this to your Docker image name
-    container_port: 3000                     # Change this to your application's port
+    image_name: "saraelsharkawy/my-node-app:latest"  # Replace with your image
+    container_name: "NodeApp"                          # Replace with your desired container name
+    container_port: 3000                                           # Adjust as needed
+    host_port: 3000                                               # Adjust as needed
 
   tasks:
-    - name: Ensure Docker is installed
+    - name: Update package repository
       apt:
-        name: docker.io
+        update_cache: yes
+
+    - name: Install required packages
+      apt:
+        name:
+          - docker.io
         state: present
-      become: yes
 
     - name: Start Docker service
-      service:
+      systemd:
         name: docker
         state: started
         enabled: yes
 
-    - name: Run Docker container
-      community.docker.docker_container:
+    - name: Pull Docker image from Docker Hub
+      docker_image:
+        name: "{{ image_name }}"
+        source: pull
+
+      - name: Run Docker container
+      docker_container:
         name: "{{ container_name }}"
         image: "{{ image_name }}"
         state: started
         restart_policy: unless-stopped
         published_ports:
-          - "{{ container_port }}:3000"  # Ensure this matches your application
+          - "{{ host_port }}:{{ container_port }}"
 
-    - name: Wait for the application to be up and running
-      uri:
-        url: "http://{{ ansible_host }}:{{ container_port }}"
-        status_code: 200
-        timeout: 60
-      register: app_status
-      retries: 6
-      delay: 10
-      until: app_status is succeeded
+                                                                                                                            40,0-1        Bot
 
-    - name: Print application URL
-      debug:
-        msg: "Application is running at http://{{ ansible_host }}:{{ container_port }}"
+                                                                                    1,28     
